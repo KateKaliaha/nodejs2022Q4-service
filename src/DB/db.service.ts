@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Artist, User } from 'src/interfaces';
+import { Artist, Track, User } from 'src/interfaces';
 
 @Injectable()
 export class DBService {
   UserDB: User[];
-  PostsDB: string[];
   ArtistsDB: Artist[];
+  TracksDB: Track[];
   constructor() {
     this.UserDB = [];
-    this.PostsDB = [];
     this.ArtistsDB = [];
+    this.TracksDB = [];
   }
 }

@@ -51,6 +51,14 @@ export class ArtistsService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    const artist = this.db.ArtistsDB.find((item) => item.id === id);
+    const tracks = this.db.TracksDB;
+    tracks.map((track) => {
+      if (artist.id === track.artistId) {
+        track.artistId = null;
+      }
+    });
     this.db.ArtistsDB.splice(index, 1);
   }
 }
