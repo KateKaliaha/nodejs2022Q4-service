@@ -35,7 +35,6 @@ export class ArtistsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Header('content-type', 'application/json')
-  // @UsePipes(new ValidationPipe({ transform: true }))
   createArtist(@Body() createArtistDto: CreateArtistDto) {
     return this.artistsService.create(createArtistDto);
   }
@@ -43,7 +42,6 @@ export class ArtistsController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
-  // @UsePipes(new ValidationPipe({ transform: true }))
   updateArtist(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: CreateArtistDto,

@@ -67,6 +67,25 @@ export class ArtistsService {
       }
     });
 
+    const favsArtists = this.db.FavsDB.artists;
+    const findIndexFavsArtist = favsArtists.findIndex((item) => item.id === id);
+    console.log(findIndexFavsArtist);
+    if (findIndexFavsArtist !== -1) {
+      this.db.FavsDB.artists.splice(findIndexFavsArtist, 1);
+    }
+
+    this.db.FavsDB.albums.map((album) => {
+      if (artist.id === album.artistId) {
+        album.artistId = null;
+      }
+    });
+
+    this.db.FavsDB.tracks.map((track) => {
+      if (artist.id === track.artistId) {
+        track.artistId = null;
+      }
+    });
+
     this.db.ArtistsDB.splice(index, 1);
   }
 }

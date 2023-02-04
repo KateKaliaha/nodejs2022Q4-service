@@ -65,6 +65,18 @@ export class AlbumsService {
       }
     });
 
+    const favsAlbums = this.db.FavsDB.albums;
+    const findIndexFavsAlbum = favsAlbums.findIndex((item) => item.id === id);
+    if (findIndexFavsAlbum !== -1) {
+      this.db.FavsDB.albums.splice(findIndexFavsAlbum, 1);
+    }
+
+    this.db.FavsDB.tracks.map((track) => {
+      if (album.id === track.albumId) {
+        track.albumId = null;
+      }
+    });
+
     this.db.AlbumsDB.splice(index, 1);
   }
 }

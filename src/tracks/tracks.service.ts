@@ -61,6 +61,12 @@ export class TracksService {
       );
     }
 
+    const favsTracks = this.db.FavsDB.tracks;
+    const findIndexFavsTrack = favsTracks.findIndex((item) => item.id === id);
+    if (findIndexFavsTrack !== -1) {
+      this.db.FavsDB.tracks.splice(findIndexFavsTrack, 1);
+    }
+
     this.db.TracksDB.splice(index, 1);
   }
 }

@@ -7,10 +7,20 @@ export class DBService {
   ArtistsDB: Artist[];
   TracksDB: Track[];
   AlbumsDB: Album[];
+  FavsDB: {
+    artists: Artist[];
+    albums: Album[];
+    tracks: Track[];
+  };
   constructor() {
     this.UserDB = [];
     this.ArtistsDB = [];
     this.TracksDB = [];
     this.AlbumsDB = [];
+    this.FavsDB = {
+      artists: [],
+      albums: [],
+      tracks: [],
+    };
   }
 }
