@@ -59,6 +59,14 @@ export class ArtistsService {
         track.artistId = null;
       }
     });
+
+    const albums = this.db.AlbumsDB;
+    albums.map((album) => {
+      if (artist.id === album.artistId) {
+        album.artistId = null;
+      }
+    });
+
     this.db.ArtistsDB.splice(index, 1);
   }
 }
