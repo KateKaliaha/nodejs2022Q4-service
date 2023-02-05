@@ -11,6 +11,12 @@
 git clone [repository](https://github.com/KateKaliaha/rsschool-nodejs-task-graphql.git)
 ```
 
+switch to the develop branch
+
+```
+git checkout develop
+```
+
 ## Installing NPM modules
 
 ```
