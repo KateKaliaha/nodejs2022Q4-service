@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from 'src/DB/db.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumsService {
@@ -30,7 +31,7 @@ export class AlbumsService {
     return newAlbum;
   }
 
-  update(id: string, artistDto: CreateAlbumDto) {
+  update(id: string, artistDto: UpdateAlbumDto) {
     const index = this.db.AlbumsDB.findIndex((item) => item.id === id);
     if (index === -1) {
       throw new HttpException(
@@ -39,9 +40,10 @@ export class AlbumsService {
       );
     }
 
-    this.db.AlbumsDB[index].name = artistDto.name;
+    this.db.AlbumsDB[index].name =
+      artistDto.name ?? this.db.AlbumsDB[index].name;
     this.db.AlbumsDB[index].year =
-      artistDto.year || this.db.AlbumsDB[index].year;
+      artistDto.year ?? this.db.AlbumsDB[index].year;
     this.db.AlbumsDB[index].artistId =
       artistDto.artistId || this.db.AlbumsDB[index].artistId;
 
@@ -66,16 +68,10 @@ export class AlbumsService {
     });
 
     const favsAlbums = this.db.FavsDB.albums;
-    const findIndexFavsAlbum = favsAlbums.findIndex((item) => item.id === id);
+    const findIndexFavsAlbum = favsAlbums.findIndex((item) => item === id);
     if (findIndexFavsAlbum !== -1) {
       this.db.FavsDB.albums.splice(findIndexFavsAlbum, 1);
     }
-
-    this.db.FavsDB.tracks.map((track) => {
-      if (album.id === track.albumId) {
-        track.albumId = null;
-      }
-    });
 
     this.db.AlbumsDB.splice(index, 1);
   }

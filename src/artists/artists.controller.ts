@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
 export class ArtistsController {
@@ -44,7 +45,7 @@ export class ArtistsController {
   @Header('content-type', 'application/json')
   updateArtist(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateArtistDto: CreateArtistDto,
+    @Body() updateArtistDto: UpdateArtistDto,
   ) {
     return this.artistsService.update(id, updateArtistDto);
   }

@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('track')
 export class TracksController {
@@ -44,7 +45,7 @@ export class TracksController {
   @Header('content-type', 'application/json')
   updateTrack(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateTrackDto: CreateTrackDto,
+    @Body() updateTrackDto: UpdateTrackDto,
   ) {
     return this.tracksService.update(id, updateTrackDto);
   }

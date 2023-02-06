@@ -5,7 +5,16 @@ import { DBService } from 'src/DB/db.service';
 export class FavsService {
   constructor(private db: DBService) {}
   getAll() {
-    return this.db.FavsDB;
+    const albums = this.db.FavsDB.albums.map((item) =>
+      this.db.AlbumsDB.find((el) => el.id === item),
+    );
+    const tracks = this.db.FavsDB.tracks.map((item) =>
+      this.db.TracksDB.find((el) => el.id === item),
+    );
+    const artists = this.db.FavsDB.artists.map((item) =>
+      this.db.ArtistsDB.find((el) => el.id === item),
+    );
+    return { albums, tracks, artists };
   }
 
   addArtist(id: string) {
@@ -18,12 +27,12 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.artists.push(artist);
+    this.db.FavsDB.artists.push(id);
     return artist;
   }
 
   deleteArtist(id: string) {
-    const index = this.db.FavsDB.artists.findIndex((item) => item.id === id);
+    const index = this.db.FavsDB.artists.findIndex((item) => item === id);
     if (index === -1) {
       throw new HttpException(
         'Artist with such ID is not existed',
@@ -43,12 +52,12 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.albums.push(album);
+    this.db.FavsDB.albums.push(id);
     return album;
   }
 
   deleteAlbum(id: string) {
-    const index = this.db.FavsDB.albums.findIndex((item) => item.id === id);
+    const index = this.db.FavsDB.albums.findIndex((item) => item === id);
     if (index === -1) {
       throw new HttpException(
         'Album with such ID is not existed',
@@ -68,12 +77,12 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.tracks.push(track);
+    this.db.FavsDB.tracks.push(id);
     return track;
   }
 
   deleteTrack(id: string) {
-    const index = this.db.FavsDB.tracks.findIndex((item) => item.id === id);
+    const index = this.db.FavsDB.tracks.findIndex((item) => item === id);
     if (index === -1) {
       throw new HttpException(
         'Track with such ID is not existed',

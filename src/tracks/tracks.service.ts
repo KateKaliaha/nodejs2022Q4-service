@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from 'src/DB/db.service';
 import { CreateTrackDto } from './dto/create-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Injectable()
 export class TracksService {
@@ -31,7 +32,7 @@ export class TracksService {
     return newTrack;
   }
 
-  update(id: string, trackDto: CreateTrackDto) {
+  update(id: string, trackDto: UpdateTrackDto) {
     const index = this.db.TracksDB.findIndex((item) => item.id === id);
     if (index === -1) {
       throw new HttpException(
@@ -40,7 +41,10 @@ export class TracksService {
       );
     }
 
-    this.db.TracksDB[index].name = trackDto.name;
+    this.db.TracksDB[index].name =
+      trackDto.name ?? this.db.TracksDB[index].name;
+    this.db.TracksDB[index].duration =
+      trackDto.duration ?? this.db.TracksDB[index].duration;
     this.db.TracksDB[index].artistId = trackDto.artistId
       ? trackDto.artistId
       : this.db.TracksDB[index].artistId;
@@ -62,7 +66,7 @@ export class TracksService {
     }
 
     const favsTracks = this.db.FavsDB.tracks;
-    const findIndexFavsTrack = favsTracks.findIndex((item) => item.id === id);
+    const findIndexFavsTrack = favsTracks.findIndex((item) => item === id);
     if (findIndexFavsTrack !== -1) {
       this.db.FavsDB.tracks.splice(findIndexFavsTrack, 1);
     }

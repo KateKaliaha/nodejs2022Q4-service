@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Controller('album')
 export class AlbumsController {
@@ -44,7 +45,7 @@ export class AlbumsController {
   @Header('content-type', 'application/json')
   updateAlbum(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateAlbumDto: CreateAlbumDto,
+    @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
     return this.albumsService.update(id, updateAlbumDto);
   }

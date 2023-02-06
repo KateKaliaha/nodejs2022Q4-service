@@ -8,9 +8,9 @@ export class DBService {
   TracksDB: Track[];
   AlbumsDB: Album[];
   FavsDB: {
-    artists: Artist[];
-    albums: Album[];
-    tracks: Track[];
+    artists: string[];
+    albums: string[];
+    tracks: string[];
   };
   constructor() {
     this.UserDB = [];
