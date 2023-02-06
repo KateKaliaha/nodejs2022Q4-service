@@ -106,10 +106,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Track'
-  responses:
-    UUIDNotValid:
-    description: ID must be uuid format
-
 paths:
   /user:
     get:

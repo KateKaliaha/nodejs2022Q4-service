@@ -32,7 +32,7 @@ npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+in your browser OpenAPI documentation by typing https://editor.swagger.io/ copy context of doc/api.yaml and paste in the editor. Change url in the line 8 from / on 'http://localhost:4000'
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 Run application in production
