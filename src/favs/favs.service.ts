@@ -28,7 +28,7 @@ export class FavsService {
     }
 
     this.db.FavsDB.artists.push(id);
-    return 'Artist added to favorites';
+    return { message: 'Artist added to favorites' };
   }
 
   deleteArtist(id: string) {
@@ -53,7 +53,7 @@ export class FavsService {
     }
 
     this.db.FavsDB.albums.push(id);
-    return 'Album added to favorites';
+    return { message: 'Album added to favorites' };
   }
 
   deleteAlbum(id: string) {
@@ -78,7 +78,7 @@ export class FavsService {
     }
 
     this.db.FavsDB.tracks.push(id);
-    return 'Track added to favorites';
+    return { message: 'Track added to favorites' };
   }
 
   deleteTrack(id: string) {
