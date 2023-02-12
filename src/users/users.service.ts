@@ -49,7 +49,7 @@ export class UsersService {
 
     const oldPassword = this.db.UserDB[index].password;
     if (oldPassword !== userDTO.oldPassword) {
-      throw new HttpException('Old password is wrong', HttpStatus.FORBIDDEN);
+      throw new HttpException('Old password is wrong!', HttpStatus.FORBIDDEN);
     }
 
     const updateTime = new Date().getTime();

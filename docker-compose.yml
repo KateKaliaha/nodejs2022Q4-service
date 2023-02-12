@@ -1,0 +1,39 @@
+services:
+  node:
+    container_name: NodeApp
+    image: katekaliaha/docker-basics-node
+    build: .
+    restart: on-failure
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    environment:
+      - PORT=${PORT}
+    volumes:
+      - ./src:/app/src
+    networks:
+      - nesjs-network
+    command: ['npm', 'run', 'start:dev']
+
+  db:
+    container_name: PostgresDB
+    image: katekaliaha/docker-basics-postgres
+    restart: on-failure
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - nesjs-network
+
+networks:
+  nesjs-network:
+    driver: bridge
+
+volumes:
+  pgdata:
