@@ -13,7 +13,8 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserEntity } from 'src/entities/user.entity';
+// import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
@@ -38,8 +39,8 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Header('content-type', 'application/json')
-  @UsePipes(new ValidationPipe({ transform: true }))
-  createUser(@Body() createUserDto: CreateUserDto) {
+  // @UsePipes(new ValidationPipe({ transform: true }))
+  createUser(@Body() createUserDto: UserEntity) {
     return this.usersService.create(createUserDto);
   }
 

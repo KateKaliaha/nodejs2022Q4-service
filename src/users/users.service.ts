@@ -1,20 +1,37 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { DBService } from 'src/DB/db.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { deletePassword } from './helpers';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/entities/user.entity';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private db: DBService) {}
-  getAll() {
-    const allUsers = this.db.UserDB;
-    return allUsers.map((user) => deletePassword(user));
-  }
-  getById(id: string) {
-    const user = this.db.UserDB.find((el) => el.id === id);
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly users: Repository<UserEntity>,
+  ) {}
+  async getAll() {
+    const allUsers = await this.users.find();
 
+    return allUsers.map((user) => {
+      deletePassword(user);
+      return {
+        ...user,
+        updatedAt: +user.updatedAt,
+        createdAt: +user.createdAt,
+      };
+    });
+  }
+
+  async getById(id: string) {
+    const user = await this.users.findOne({
+      where: {
+        id: id,
+      },
+    });
     if (!user) {
       throw new HttpException(
         'User with such ID is not existed',
@@ -23,53 +40,68 @@ export class UsersService {
     }
     return deletePassword(user);
   }
-  create(userDto: CreateUserDto) {
-    const time = new Date().getTime();
-    const newUser = {
-      id: uuidv4(),
-      version: 1,
-      createdAt: time,
-      updatedAt: time,
-      ...userDto,
-    };
-    this.db.UserDB.push(newUser);
+
+  async create(userDto: CreateUserDto) {
+    const time = Date.now();
+    const newUser = new UserEntity();
+    newUser.id = uuidv4();
+    newUser.version = 1;
+    newUser.createdAt = time;
+    newUser.updatedAt = time;
+    newUser.login = userDto.login;
+    newUser.password = userDto.password;
+
+    await this.users.save(newUser);
 
     return deletePassword(newUser);
   }
 
-  update(id: string, userDTO: UpdateUserDto) {
-    const index = this.db.UserDB.findIndex((el) => el.id === id);
+  async update(id: string, userDTO: UpdateUserDto) {
+    const user = await this.users.findOne({
+      where: {
+        id: id,
+      },
+    });
 
-    if (index === -1) {
+    if (!user) {
       throw new HttpException(
         'User with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const oldPassword = this.db.UserDB[index].password;
+    const oldPassword = user.password;
+
     if (oldPassword !== userDTO.oldPassword) {
       throw new HttpException('Old password is wrong!', HttpStatus.FORBIDDEN);
     }
 
     const updateTime = new Date().getTime();
-    this.db.UserDB[index].version += 1;
-    this.db.UserDB[index].updatedAt += updateTime;
-    this.db.UserDB[index].password = userDTO.newPassword;
 
-    return deletePassword(this.db.UserDB[index]);
+    user.version += 1;
+    user.updatedAt = updateTime;
+    user.password = userDTO.newPassword;
+    user.createdAt = +user.createdAt;
+
+    await this.users.save(user);
+
+    return deletePassword(user);
   }
 
-  delete(id: string) {
-    const index = this.db.UserDB.findIndex((el) => el.id === id);
+  async delete(id: string) {
+    const user = await this.users.findOne({
+      where: {
+        id: id,
+      },
+    });
 
-    if (index === -1) {
+    if (!user) {
       throw new HttpException(
         'User with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    this.db.UserDB.splice(index, 1);
+    await this.users.remove(user);
   }
 }
