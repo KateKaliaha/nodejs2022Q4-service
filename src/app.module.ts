@@ -9,6 +9,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
+import { AlbumEntity } from './entities/album.entity';
+import { ArtistEntity } from './entities/artist.entity';
+import { TrackEntity } from './entities/track.entity';
 
 @Module({
   imports: [
@@ -30,7 +33,7 @@ import { UserEntity } from './entities/user.entity';
         database: config.get<string>('TYPEORM_DATABASE'),
         port: config.get<number>('TYPEORM_PORT'),
         synchronize: true,
-        entities: [UserEntity],
+        entities: [UserEntity, AlbumEntity, ArtistEntity, TrackEntity],
         autoLoadEntities: true,
         logging: true,
         // migrationsTableName: 'migration',

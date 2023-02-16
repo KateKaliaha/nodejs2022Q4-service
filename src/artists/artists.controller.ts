@@ -10,6 +10,8 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -43,6 +45,7 @@ export class ArtistsController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
+  @UsePipes(new ValidationPipe({ transform: true }))
   updateArtist(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistDto,

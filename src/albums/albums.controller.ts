@@ -10,6 +10,8 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AlbumsService } from './albums.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -43,6 +45,7 @@ export class AlbumsController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
+  @UsePipes(new ValidationPipe({ transform: true }))
   updateAlbum(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
