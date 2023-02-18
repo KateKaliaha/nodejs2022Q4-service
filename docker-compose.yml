@@ -1,8 +1,8 @@
 services:
   node:
     container_name: NodeApp
-    # image: katekaliaha/docker-basics-node
-    build: .
+    image: katekaliaha/docker-basics-node
+    # build: .
     restart: on-failure
     ports:
       - ${PORT}:${PORT}
@@ -18,8 +18,8 @@ services:
 
   db:
     container_name: PostgresDB
-    # image: katekaliaha/docker-basics-postgres
-    build: ./dataStore
+    image: katekaliaha/docker-basics-postgres
+    # build: ./dataStore
     restart: on-failure
     ports:
       - ${TYPEORM_PORT}:${TYPEORM_PORT}
