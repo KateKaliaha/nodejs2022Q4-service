@@ -22,29 +22,24 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   getAll() {
     return this.usersService.getAll();
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   getUserById(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getById(id);
   }
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
   @Header('content-type', 'application/json')
-  @UsePipes(new ValidationPipe({ transform: true }))
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Put(':id')
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   @UsePipes(new ValidationPipe({ transform: true }))
   updateUser(

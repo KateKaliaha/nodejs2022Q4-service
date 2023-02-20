@@ -1,76 +1,90 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { DBService } from 'src/DB/db.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TrackEntity } from 'src/entities/track.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TracksService {
-  constructor(private db: DBService) {}
-  getAll() {
-    return this.db.TracksDB;
+  constructor(
+    @InjectRepository(TrackEntity)
+    private readonly tracks: Repository<TrackEntity>,
+  ) {}
+  async getAll() {
+    return await this.tracks.find();
   }
-  getById(id: string) {
-    const track = this.db.TracksDB.find((item) => item.id === id);
+
+  async getById(id: string) {
+    const track = await this.tracks.findOne({
+      where: {
+        id: id,
+      },
+    });
+
     if (!track) {
       throw new HttpException(
         'Track with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
+
     return track;
   }
-  create(trackDto: CreateTrackDto) {
-    const newTrack = {
-      id: uuidv4(),
-      name: trackDto.name,
-      artistId: trackDto.artistId || null,
-      albumId: trackDto.albumId || null,
-      duration: trackDto.duration,
-    };
-    this.db.TracksDB.push(newTrack);
-    return newTrack;
+
+  async create(trackDto: CreateTrackDto) {
+    const track = new TrackEntity();
+
+    track.id = uuidv4();
+    track.name = trackDto.name;
+    track.artistId = trackDto.artistId || null;
+    track.albumId = trackDto.albumId || null;
+    track.duration = trackDto.duration;
+
+    await this.tracks.save(track);
+
+    return track;
   }
 
-  update(id: string, trackDto: UpdateTrackDto) {
-    const index = this.db.TracksDB.findIndex((item) => item.id === id);
-    if (index === -1) {
+  async update(id: string, trackDto: UpdateTrackDto) {
+    const track = await this.tracks.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!track) {
       throw new HttpException(
         'Track with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    this.db.TracksDB[index].name =
-      trackDto.name ?? this.db.TracksDB[index].name;
-    this.db.TracksDB[index].duration =
-      trackDto.duration ?? this.db.TracksDB[index].duration;
-    this.db.TracksDB[index].artistId = trackDto.artistId
-      ? trackDto.artistId
-      : this.db.TracksDB[index].artistId;
-    this.db.TracksDB[index].albumId = trackDto.albumId
-      ? trackDto.albumId
-      : this.db.TracksDB[index].albumId;
-    this.db.TracksDB[index].duration = trackDto.duration;
+    track.name = trackDto.name ?? track.name;
+    track.duration = trackDto.duration ?? track.duration;
+    track.artistId = trackDto.artistId ?? track.artistId;
+    track.albumId = trackDto.albumId ?? track.albumId;
 
-    return this.db.TracksDB[index];
+    await this.tracks.save(track);
+
+    return track;
   }
 
-  delete(id: string) {
-    const index = this.db.TracksDB.findIndex((item) => item.id === id);
-    if (index === -1) {
+  async delete(id: string) {
+    const track = await this.tracks.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!track) {
       throw new HttpException(
         'Artist with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const favsTracks = this.db.FavsDB.tracks;
-    const findIndexFavsTrack = favsTracks.findIndex((item) => item === id);
-    if (findIndexFavsTrack !== -1) {
-      this.db.FavsDB.tracks.splice(findIndexFavsTrack, 1);
-    }
-
-    this.db.TracksDB.splice(index, 1);
+    await this.tracks.remove(track);
   }
 }

@@ -1,24 +1,47 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DBService } from 'src/DB/db.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AlbumEntity } from 'src/entities/album.entity';
+import { ArtistEntity } from 'src/entities/artist.entity';
+import { FavsEntity } from 'src/entities/favs.entity';
+import { TrackEntity } from 'src/entities/track.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class FavsService {
-  constructor(private db: DBService) {}
-  getAll() {
-    const albums = this.db.FavsDB.albums.map((item) =>
-      this.db.AlbumsDB.find((el) => el.id === item),
-    );
-    const tracks = this.db.FavsDB.tracks.map((item) =>
-      this.db.TracksDB.find((el) => el.id === item),
-    );
-    const artists = this.db.FavsDB.artists.map((item) =>
-      this.db.ArtistsDB.find((el) => el.id === item),
-    );
-    return { albums, tracks, artists };
+  constructor(
+    @InjectRepository(FavsEntity)
+    private readonly favs: Repository<FavsEntity>,
+    @InjectRepository(AlbumEntity)
+    private readonly albums: Repository<AlbumEntity>,
+    @InjectRepository(ArtistEntity)
+    private readonly artists: Repository<ArtistEntity>,
+    @InjectRepository(TrackEntity)
+    private readonly tracks: Repository<TrackEntity>,
+  ) {}
+
+  async getAll() {
+    const [favorites] = await this.favs.find({
+      relations: {
+        artists: true,
+        albums: true,
+        tracks: true,
+      },
+    });
+
+    if (!favorites) {
+      await this.favs.save(new FavsEntity());
+      return this.getAll();
+    }
+
+    return favorites;
   }
 
-  addArtist(id: string) {
-    const artist = this.db.ArtistsDB.find((item) => item.id === id);
+  async addArtist(id: string) {
+    const artist = await this.artists.findOne({
+      where: {
+        id: id,
+      },
+    });
 
     if (!artist) {
       throw new HttpException(
@@ -27,24 +50,43 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.artists.push(id);
+    const fav = await this.getAll();
+    fav.artists.push(artist);
+    await this.favs.save(fav);
     return { message: 'Artist added to favorites' };
   }
 
-  deleteArtist(id: string) {
-    const index = this.db.FavsDB.artists.findIndex((item) => item === id);
-    if (index === -1) {
+  async deleteArtist(id: string) {
+    const artist = await this.artists.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!artist) {
       throw new HttpException(
         'Artist with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    this.db.FavsDB.artists.splice(index, 1);
+    const fav = await this.getAll();
+    const index = fav.artists.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      fav.artists.splice(index, 1);
+    }
+
+    await this.favs.save(fav);
   }
 
-  addAlbum(id: string) {
-    const album = this.db.AlbumsDB.find((item) => item.id === id);
+  async addAlbum(id: string) {
+    const album = await this.albums.findOne({
+      where: {
+        id: id,
+      },
+    });
+
     if (!album) {
       throw new HttpException(
         'Album with such ID is not existed',
@@ -52,24 +94,41 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.albums.push(id);
+    const fav = await this.getAll();
+    fav.albums.push(album);
+    await this.favs.save(fav);
+
     return { message: 'Album added to favorites' };
   }
 
-  deleteAlbum(id: string) {
-    const index = this.db.FavsDB.albums.findIndex((item) => item === id);
-    if (index === -1) {
+  async deleteAlbum(id: string) {
+    const album = await this.albums.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!album) {
       throw new HttpException(
         'Album with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
 
-    this.db.FavsDB.albums.splice(index, 1);
+    const fav = await this.getAll();
+    const index = fav.albums.findIndex((item) => item.id === id);
+
+    if (index !== -1) {
+      fav.albums.splice(index, 1);
+    }
+    await this.favs.save(fav);
   }
 
-  addTrack(id: string) {
-    const track = this.db.TracksDB.find((item) => item.id === id);
+  async addTrack(id: string) {
+    const track = await this.tracks.findOne({
+      where: {
+        id: id,
+      },
+    });
     if (!track) {
       throw new HttpException(
         'Track with such ID is not existed',
@@ -77,19 +136,32 @@ export class FavsService {
       );
     }
 
-    this.db.FavsDB.tracks.push(id);
+    const fav = await this.getAll();
+    fav.tracks.push(track);
+    await this.favs.save(fav);
     return { message: 'Track added to favorites' };
   }
 
-  deleteTrack(id: string) {
-    const index = this.db.FavsDB.tracks.findIndex((item) => item === id);
-    if (index === -1) {
+  async deleteTrack(id: string) {
+    const track = await this.tracks.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!track) {
       throw new HttpException(
         'Track with such ID is not existed',
         HttpStatus.NOT_FOUND,
       );
     }
+    const fav = await this.getAll();
 
-    this.db.FavsDB.tracks.splice(index, 1);
+    const index = fav.tracks.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      fav.tracks.splice(index, 1);
+    }
+
+    await this.favs.save(fav);
   }
 }
