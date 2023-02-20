@@ -6,10 +6,10 @@ export class UserEntity {
   id: string;
 
   @Column()
-  login: string;
+  login!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column()
   version: number;

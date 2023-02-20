@@ -9,13 +9,28 @@ git clone [repository](https://github.com/KateKaliaha/rsschool-nodejs-task-graph
 switch to the develop branch
 
 ```
-git checkout develop
+git checkout feature/home-ls-part2
 ```
 
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Running application with docker
+
+Run your docker application
+Rename file .env.example to .env
+
+```
+docker-compose up
+```
+
+## Scan docker image
+
+```
+npm run docker:scan
 ```
 
 ## Running application

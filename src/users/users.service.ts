@@ -27,10 +27,8 @@ export class UsersService {
   }
 
   async getById(id: string) {
-    const user = await this.users.findOne({
-      where: {
-        id: id,
-      },
+    const user = await this.users.findOneBy({
+      id,
     });
     if (!user) {
       throw new HttpException(
@@ -44,6 +42,18 @@ export class UsersService {
   async create(userDto: CreateUserDto) {
     const time = Date.now();
     const newUser = new UserEntity();
+    // const newUser = this.users.create({
+    //   id: uuidv4(),
+    //   version: 1,
+    //   createdAt: time,
+    //   updatedAt: time,
+    //   login: userDto.login,
+    //   password: userDto.password,
+    // });
+    // if (userDto.login === null || userDto.password === null) {
+    //   throw new HttpException('Login must be string', HttpStatus.BAD_REQUEST);
+    // }
+    // const newUser = {} as UserEntity;
     newUser.id = uuidv4();
     newUser.version = 1;
     newUser.createdAt = time;

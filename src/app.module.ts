@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { DBModule } from './DB/db.module';
 import { UsersModule } from './users/users.module';
 import { ArtistsModule } from './artists/artists.module';
 import { TracksModule } from './tracks/tracks.module';
@@ -16,7 +15,6 @@ import { TrackEntity } from './entities/track.entity';
 @Module({
   imports: [
     UsersModule,
-    DBModule,
     ArtistsModule,
     TracksModule,
     AlbumsModule,
@@ -41,12 +39,6 @@ import { TrackEntity } from './entities/track.entity';
           FavsModule,
         ],
         autoLoadEntities: true,
-        logging: true,
-        // migrationsTableName: 'migration',
-        // migrations: ['src/migration/*.ts'],
-        // cli: {
-        //   migrationsDir: 'src/migration',
-        // },
       }),
       dataSourceFactory: async (options) => {
         const dataSource = await new DataSource(options).initialize();

@@ -13,7 +13,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { UserEntity } from 'src/entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
@@ -22,28 +22,24 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   getAll() {
     return this.usersService.getAll();
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   getUserById(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getById(id);
   }
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
   @Header('content-type', 'application/json')
-  createUser(@Body() createUserDto: UserEntity) {
+  createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Put(':id')
-  @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
   @UsePipes(new ValidationPipe({ transform: true }))
   updateUser(

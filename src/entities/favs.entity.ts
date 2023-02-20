@@ -1,4 +1,3 @@
-// import { Exclude } from 'class-transformer';
 import { Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AlbumEntity } from './album.entity';
 import { ArtistEntity } from './artist.entity';

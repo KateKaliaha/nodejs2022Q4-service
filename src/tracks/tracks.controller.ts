@@ -10,8 +10,6 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -45,7 +43,6 @@ export class TracksController {
   @Put(':id')
   @HttpCode(HttpStatus.OK)
   @Header('content-type', 'application/json')
-  @UsePipes(new ValidationPipe({ transform: true }))
   updateTrack(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
