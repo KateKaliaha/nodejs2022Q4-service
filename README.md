@@ -15,7 +15,7 @@ git checkout feature/home-ls-part2
 ## Installing NPM modules
 
 ```
-npm install
+npm install --legacy-peer-deps
 ```
 
 ## Running application with docker
@@ -27,7 +27,7 @@ Rename file .env.example to .env
 docker-compose up
 ```
 
-## Scan docker image
+## Running vulnerabilities image
 
 ```
 npm run docker:scan
