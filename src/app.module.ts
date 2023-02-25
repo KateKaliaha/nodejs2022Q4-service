@@ -11,6 +11,8 @@ import { UserEntity } from './entities/user.entity';
 import { AlbumEntity } from './entities/album.entity';
 import { ArtistEntity } from './entities/artist.entity';
 import { TrackEntity } from './entities/track.entity';
+import { AuthModule } from './auth/auth.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { TrackEntity } from './entities/track.entity';
         return dataSource;
       },
     }),
+    AuthModule,
+    TokenModule,
   ],
   controllers: [],
   providers: [],
