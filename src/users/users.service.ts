@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -39,27 +40,23 @@ export class UsersService {
     return deletePassword(user);
   }
 
+  async getByLogin(login: string) {
+    const user = await this.users.findOneBy({
+      login,
+    });
+
+    return user;
+  }
+
   async create(userDto: CreateUserDto) {
     const time = Date.now();
     const newUser = new UserEntity();
-    // const newUser = this.users.create({
-    //   id: uuidv4(),
-    //   version: 1,
-    //   createdAt: time,
-    //   updatedAt: time,
-    //   login: userDto.login,
-    //   password: userDto.password,
-    // });
-    // if (userDto.login === null || userDto.password === null) {
-    //   throw new HttpException('Login must be string', HttpStatus.BAD_REQUEST);
-    // }
-    // const newUser = {} as UserEntity;
     newUser.id = uuidv4();
     newUser.version = 1;
     newUser.createdAt = time;
     newUser.updatedAt = time;
     newUser.login = userDto.login;
-    newUser.password = userDto.password;
+    newUser.password = await bcrypt.hash(userDto.password, 10);
 
     await this.users.save(newUser);
 
