@@ -13,6 +13,8 @@ import { ArtistEntity } from './entities/artist.entity';
 import { TrackEntity } from './entities/track.entity';
 import { AuthModule } from './auth/auth.module';
 import { TokenModule } from './token/token.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards/jwt-guard';
 
 @Module({
   imports: [
@@ -51,6 +53,11 @@ import { TokenModule } from './token/token.module';
     TokenModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

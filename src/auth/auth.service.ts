@@ -3,10 +3,14 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { UserLoginDto } from './dto/user-login.dto';
 import * as bcrypt from 'bcrypt';
+import { TokenService } from 'src/token/token.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) {}
+  constructor(
+    private readonly userService: UsersService,
+    private readonly tokenService: TokenService,
+  ) {}
 
   async signUsers(userDTO: CreateUserDto) {
     return this.userService.create(userDTO);
@@ -26,6 +30,7 @@ export class AuthService {
       throw new HttpException('Wrong login or email', HttpStatus.FORBIDDEN);
     }
 
-    return user;
+    const tokens = await this.tokenService.createTokens(user);
+    return tokens;
   }
 }

@@ -17,14 +17,16 @@ export class UsersService {
   async getAll() {
     const allUsers = await this.users.find();
 
-    return allUsers.map((user) => {
-      deletePassword(user);
+    const publicUsers = allUsers.map((user) => {
+      const publicUser = deletePassword(user);
       return {
-        ...user,
+        ...publicUser,
         updatedAt: +user.updatedAt,
         createdAt: +user.createdAt,
       };
     });
+
+    return publicUsers;
   }
 
   async getById(id: string) {
@@ -77,9 +79,14 @@ export class UsersService {
       );
     }
 
-    const oldPassword = user.password;
+    // const oldPassword = user.password;
 
-    if (oldPassword !== userDTO.oldPassword) {
+    const isValidatePassword = await bcrypt.compare(
+      userDTO.oldPassword,
+      user.password,
+    );
+
+    if (!isValidatePassword) {
       throw new HttpException('Old password is wrong!', HttpStatus.FORBIDDEN);
     }
 
@@ -87,7 +94,7 @@ export class UsersService {
 
     user.version += 1;
     user.updatedAt = updateTime;
-    user.password = userDTO.newPassword;
+    user.password = await bcrypt.hash(userDTO.newPassword, 10);
     user.createdAt = +user.createdAt;
 
     await this.users.save(user);
