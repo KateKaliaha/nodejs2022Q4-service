@@ -58,6 +58,10 @@ import { JwtAuthGuard } from './guards/jwt-guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtRefreshGuard,
+    // },
   ],
 })
 export class AppModule {}

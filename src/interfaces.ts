@@ -33,3 +33,10 @@ export interface Favorites {
   albums: string[]; // favorite albums ids
   tracks: string[]; // favorite tracks ids
 }
+
+export interface decodeJWT {
+  userId: string;
+  login: string;
+  iat: number;
+  exp: number;
+}

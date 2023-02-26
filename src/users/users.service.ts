@@ -79,8 +79,6 @@ export class UsersService {
       );
     }
 
-    // const oldPassword = user.password;
-
     const isValidatePassword = await bcrypt.compare(
       userDTO.oldPassword,
       user.password,
