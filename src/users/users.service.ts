@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -16,14 +17,16 @@ export class UsersService {
   async getAll() {
     const allUsers = await this.users.find();
 
-    return allUsers.map((user) => {
-      deletePassword(user);
+    const publicUsers = allUsers.map((user) => {
+      const publicUser = deletePassword(user);
       return {
-        ...user,
+        ...publicUser,
         updatedAt: +user.updatedAt,
         createdAt: +user.createdAt,
       };
     });
+
+    return publicUsers;
   }
 
   async getById(id: string) {
@@ -39,27 +42,23 @@ export class UsersService {
     return deletePassword(user);
   }
 
+  async getByLogin(login: string) {
+    const user = await this.users.findOneBy({
+      login,
+    });
+
+    return user;
+  }
+
   async create(userDto: CreateUserDto) {
     const time = Date.now();
     const newUser = new UserEntity();
-    // const newUser = this.users.create({
-    //   id: uuidv4(),
-    //   version: 1,
-    //   createdAt: time,
-    //   updatedAt: time,
-    //   login: userDto.login,
-    //   password: userDto.password,
-    // });
-    // if (userDto.login === null || userDto.password === null) {
-    //   throw new HttpException('Login must be string', HttpStatus.BAD_REQUEST);
-    // }
-    // const newUser = {} as UserEntity;
     newUser.id = uuidv4();
     newUser.version = 1;
     newUser.createdAt = time;
     newUser.updatedAt = time;
     newUser.login = userDto.login;
-    newUser.password = userDto.password;
+    newUser.password = await bcrypt.hash(userDto.password, 10);
 
     await this.users.save(newUser);
 
@@ -80,9 +79,12 @@ export class UsersService {
       );
     }
 
-    const oldPassword = user.password;
+    const isValidatePassword = await bcrypt.compare(
+      userDTO.oldPassword,
+      user.password,
+    );
 
-    if (oldPassword !== userDTO.oldPassword) {
+    if (!isValidatePassword) {
       throw new HttpException('Old password is wrong!', HttpStatus.FORBIDDEN);
     }
 
@@ -90,7 +92,7 @@ export class UsersService {
 
     user.version += 1;
     user.updatedAt = updateTime;
-    user.password = userDTO.newPassword;
+    user.password = await bcrypt.hash(userDTO.newPassword, 10);
     user.createdAt = +user.createdAt;
 
     await this.users.save(user);
