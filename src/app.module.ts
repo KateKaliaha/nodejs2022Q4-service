@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { ArtistsModule } from './artists/artists.module';
 import { TracksModule } from './tracks/tracks.module';
@@ -13,8 +13,10 @@ import { ArtistEntity } from './entities/artist.entity';
 import { TrackEntity } from './entities/track.entity';
 import { AuthModule } from './auth/auth.module';
 import { TokenModule } from './token/token.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards/jwt-guard';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { HttpExceptionFilter } from './logger/http-exeption.filter';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { JwtAuthGuard } from './guards/jwt-guard';
     AlbumsModule,
     FavsModule,
     ConfigModule,
+
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule.forRoot()],
       inject: [ConfigService],
@@ -58,10 +61,14 @@ import { JwtAuthGuard } from './guards/jwt-guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtRefreshGuard,
-    // },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
