@@ -10,11 +10,13 @@ async function bootstrap() {
 
   app.useLogger(logger);
   process.on('uncaughtException', (error) => {
-    logger.error('[Uncaught Exception]', error);
+    logger.error('[Uncaught Exception]', error, error.stack);
+    process.exit(1);
   });
 
-  process.on('unhandledRejection', (reason) => {
-    logger.error('[Unhandled Rejection]', reason);
+  process.on('unhandledRejection', (error: Error) => {
+    logger.error('[Unhandled Rejection]', error.stack);
+    process.exit(1);
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
